@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import React, { useRef, useState } from 'react';
+import { Canvas, useFrame, useResource } from '@react-three/fiber';
+import { MeshDiscardMaterial, OrbitControls, PerspectiveCamera } from '@react-three/drei'
+import { Model } from './Model'
 
 function Box(props) {
   // This reference gives us direct access to the THREE.Mesh object
@@ -25,6 +26,30 @@ function Box(props) {
   )
 }
 
+function MovingCameraView(props) {
+  const cameraRef = useRef();
+  const [isAnimating, setIsAnimating] = useState(false);
+  useFrame(() => {
+    if (!cameraRef.current) return;
+
+    const camera = cameraRef.current;
+    console.log("EVAN HERE:", camera)
+    const delta = 0.01;
+
+    if (isAnimating) {
+      camera.position.x += delta;
+      camera.position.y += delta;
+    }
+  });
+    const handleAnimationToggle = () => {
+    setIsAnimating(!isAnimating);
+  };
+
+  return (
+    <PerspectiveCamera ref={cameraRef} makeDefault position={[0, 1, 5]} />
+  );
+}
+
 export default function App() {
   return (
     <Canvas>
@@ -34,6 +59,8 @@ export default function App() {
       <Box position={[-1.2, 0, 0]} />
       <Box position={[1.2, 0, 0]} />
       <OrbitControls />
+      <MovingCameraView/>
+      <Model />
     </Canvas>
   )
 }
